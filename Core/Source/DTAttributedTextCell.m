@@ -51,7 +51,7 @@
 	}
 	else
 	{
-		CGFloat neededContentHeight = [self requiredRowHeightInTableView:[self _containingTableView]];
+		CGFloat neededContentHeight = [self requiredRowHeightInTableView:[self _containingTableView:self.superview]];
 	
 		// after the first call here the content view size is correct
 		CGRect frame = CGRectMake(0, 0, self.contentView.bounds.size.width, neededContentHeight);
@@ -59,18 +59,16 @@
 	}
 }
 
-- (UITableView *)_containingTableView
+- (UITableView *)_containingTableView:(UIView *)view
 {
-	UIView *tableView = self.superview;
-	
-	while (tableView)
+	while (view)
 	{
-		if ([tableView isKindOfClass:[UITableView class]])
+		if ([view isKindOfClass:[UITableView class]])
 		{
-			return (UITableView *)tableView;
+			return (UITableView *)view;
 		}
 		
-		tableView = tableView.superview;
+		view = view.superview;
 	}
 	
 	return nil;
@@ -78,19 +76,12 @@
 
 - (void)willMoveToSuperview:(UIView *)newSuperview
 {
-	UITableView *tableView = (UITableView *)newSuperview;
-	
-	if (![tableView isKindOfClass:[UITableView class]])
-	{
-		tableView = (UITableView *)tableView.superview;
-	}
-	
-	if ([self _containingTableView].style == UITableViewStyleGrouped)
+	if ([self _containingTableView:newSuperview].style == UITableViewStyleGrouped)
 	{
 		// need no background because otherwise this would overlap the rounded corners
 		_attributedTextContextView.backgroundColor = [DTColor clearColor];
 	}
-	
+
 	[super willMoveToSuperview:newSuperview];
 }
 
